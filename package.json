@@ -1,0 +1,29 @@
+{
+  "name": "MoreStickers-Converter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "build": "tsc",
+    "fix": "gts fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "gts": "^6.0.0",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "telegraf": "^4.16.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "type": "module"
+}
