@@ -22,7 +22,7 @@ app.get(
       await reply.code(400).send('Invalid sticker pack name');
       return;
     }
-    if (!/^[a-zA-Z0-9_]+$/i.test(stickerId)) {
+    if (!/^[a-zA-Z0-9_-]+$/i.test(stickerId)) {
       await reply.code(400).send('Invalid sticker id');
       return;
     }
