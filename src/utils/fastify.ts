@@ -33,19 +33,19 @@ app.get(
     }
 
     const stickerFilePath = path.join(DATA_DIR, stickerPackName, filename);
-    try {
-      await fsp.access(stickerFilePath);
-    } catch {
-      await reply.code(404).send('Sticker not found');
-      return;
-    }
 
-    const fileStream = fs.createReadStream(stickerFilePath);
-    await reply
-      .type(
-        fileExtension === 'webp' ? 'image/webp' : 'application/octet-stream',
-      )
-      .send(fileStream);
+    try {
+      const fileStream = fs.createReadStream(stickerFilePath, {
+        highWaterMark: 64 * 1024,
+      });
+      await reply
+        .type(
+          fileExtension === 'webp' ? 'image/webp' : 'application/octet-stream',
+        )
+        .send(fileStream);
+    } catch {
+      await reply.code(500).send('Internal server error');
+    }
   },
 );
 
