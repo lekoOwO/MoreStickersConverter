@@ -19,16 +19,16 @@ app.get(
 
     // Sanitize stickerPackName and stickerId
     if (!/^[a-z0-9_]+$/i.test(stickerPackName)) {
-      await reply.status(400).send('Invalid sticker pack name');
+      await reply.code(400).send('Invalid sticker pack name');
       return;
     }
-    if (!/^[a-z0-9_]+$/i.test(stickerId)) {
-      await reply.status(400).send('Invalid sticker id');
+    if (!/^[a-zA-Z0-9_]+$/i.test(stickerId)) {
+      await reply.code(400).send('Invalid sticker id');
       return;
     }
 
     if (!/^(?:webp|tgs)$/i.test(fileExtension)) {
-      await reply.status(400).send('Invalid file extension');
+      await reply.code(400).send('Invalid file extension');
       return;
     }
 
@@ -36,7 +36,7 @@ app.get(
     try {
       await fsp.access(stickerFilePath);
     } catch {
-      await reply.status(404).send('Sticker not found');
+      await reply.code(404).send('Sticker not found');
       return;
     }
 
