@@ -42,6 +42,7 @@ app.get(
         .type(
           fileExtension === 'webp' ? 'image/webp' : 'application/octet-stream',
         )
+        .header('Cache-Control', 'public, max-age=31536000')
         .send(fileStream);
     } catch {
       await reply.code(500).send('Internal server error');

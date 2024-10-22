@@ -46,8 +46,22 @@ async function downloadSticker(
 
   const fileLink = await telegram.getFileLink(stickerFile.file_id);
   const fileStream = fs.createWriteStream(stickerFilePath);
-  const response = await fetch(fileLink, {method: 'GET'});
-  if (!response.body) {
+  let retries = 5;
+  let response: Response | null = null;
+  // eslint-disable-next-line no-constant-condition
+  while (retries--) {
+    try {
+      response = await fetch(fileLink);
+      break;
+    } catch (e) {
+      console.error(e);
+      if (retries === 0) {
+        await downloadSticker(queue, telegram, stickerSet);
+        return;
+      }
+    }
+  }
+  if (!response?.body) {
     await downloadSticker(queue, telegram, stickerSet);
     return;
   }
