@@ -6,6 +6,7 @@ import {
   isStickerPackDownloaded,
 } from './telegramStickers.js';
 import path from 'path';
+import fsp from 'fs/promises';
 
 const bot: Telegraf = new Telegraf(process.env.BOT_TOKEN!);
 
@@ -19,23 +20,29 @@ bot.on(message('sticker'), async ctx => {
 
   // Download the whole sticker pack
   const stickerSet = await ctx.telegram.getStickerSet(stickerPackName);
-  if (await isStickerPackDownloaded(stickerPackName)) {
-    await ctx.reply('The sticker pack is already downloaded.');
-    return;
-  }
-
-  const firstMessage = await ctx.reply('Downloading the sticker pack...');
-  await downloadStickerPack(ctx.telegram, stickerSet);
-  await ctx.telegram.editMessageText(
-    ctx.chat.id,
-    firstMessage.message_id,
-    undefined,
-    'The sticker pack has been downloaded.',
-  );
   const mcStickerPackPath = path.join(
     DATA_DIR,
     stickerSet.name + '.telegram.stickerpack',
   );
+  if (await isStickerPackDownloaded(stickerPackName)) {
+    try {
+      await fsp.access(mcStickerPackPath);
+    } catch {
+      await ctx.reply('Error: Sticker pack not found.');
+      return;
+    }
+    await ctx.replyWithDocument(Input.fromLocalFile(mcStickerPackPath));
+    return;
+  }
+
+  await ctx.reply('Downloading the sticker pack...');
+  await downloadStickerPack(ctx.telegram, stickerSet);
+  try {
+    await fsp.access(mcStickerPackPath);
+  } catch {
+    await ctx.reply('Error: Sticker pack download error.');
+    return;
+  }
   await ctx.replyWithDocument(Input.fromLocalFile(mcStickerPackPath));
 });
 
