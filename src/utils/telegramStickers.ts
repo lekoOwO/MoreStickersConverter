@@ -8,9 +8,17 @@ import {Sticker, StickerSet} from 'telegraf/types';
 
 const DATA_DIR = path.join(path.resolve(process.env.DATA_DIR!), 'telegram');
 const CONCURRENCY = parseInt(process.env.CONCURRENCY || '5');
-const MC_STICKER_PACK_ID_PREFIX = 'telegram:';
-const MC_STICKER_ID_PREFIX = 'telegram:';
+const MC_STICKER_PACK_ID_PREFIX = 'MoreStickers:Telegram:Pack';
+const MC_STICKER_ID_PREFIX = 'MoreStickers:Telegram:Sticker';
 const EXTERNAL_URL = process.env.EXTERNAL_URL!;
+
+function toMcStickerPackId(stickerSetName: string) {
+  return `${MC_STICKER_PACK_ID_PREFIX}:${stickerSetName}`;
+}
+
+function toMcStickerId(stickerId: string, stickerPackName: string) {
+  return `${MC_STICKER_ID_PREFIX}:${stickerPackName}:${stickerId}`;
+}
 
 function generateExternalUrl(
   stickerPackName: string,
@@ -97,21 +105,21 @@ async function toMcStickerPack(
     const stickerFile = await telegram.getFile(sticker.file_id);
     const stickerFileType = stickerFile.file_path?.split('.').pop() || '';
     return {
-      id: `${MC_STICKER_ID_PREFIX}${sticker.file_unique_id}`,
+      id: toMcStickerId(sticker.file_unique_id, stickerSet.name),
       image: generateExternalUrl(
         stickerSet.name,
         sticker.file_unique_id,
         stickerFileType,
       ),
       title: sticker.emoji,
-      stickerPackId: `${MC_STICKER_PACK_ID_PREFIX}${stickerSet.name}`,
+      stickerPackId: toMcStickerPackId(stickerSet.name),
       filename: stickerFile.file_unique_id + '.' + stickerFileType,
       isAnimated: sticker.is_animated,
     } as McSticker;
   });
   const stickers = await Promise.all(stickerPs);
   return {
-    id: `${MC_STICKER_PACK_ID_PREFIX}${stickerSet.name}`,
+    id: toMcStickerPackId(stickerSet.name),
     title: stickerSet.title,
     logo: stickers[0],
     stickers,
