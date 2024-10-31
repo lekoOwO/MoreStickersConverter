@@ -28,9 +28,21 @@ function generateExternalUrl(
   return `${EXTERNAL_URL}/sticker/telegram/${stickerPackName}/${stickerId}.${fileExtension}`;
 }
 
+export function generateStickerPackDirPath(stickerSetName: string) {
+  return path.join(DATA_DIR, stickerSetName);
+}
+
+export function generateStickerPackFilePath(stickerSetName: string){
+  return path.join(
+    DATA_DIR,
+    stickerSetName + '.telegram.stickerpack',
+  );
+}
+
 async function isStickerPackDownloaded(stickerSetName: string) {
   try {
-    await fsp.access(path.join(DATA_DIR, stickerSetName));
+    const p = generateStickerPackDirPath(stickerSetName);
+    await fsp.access(p);
     return true;
   } catch {
     return false;
@@ -46,9 +58,9 @@ async function downloadSticker(
   const sticker = queue.shift()!;
   const stickerFile = await telegram.getFile(sticker.file_id);
   const stickerFileType = stickerFile.file_path?.split('.').pop() || '';
+  const stickerPackDirPath = generateStickerPackDirPath(stickerSet.name);
   const stickerFilePath = path.join(
-    DATA_DIR,
-    stickerSet.name,
+    stickerPackDirPath,
     stickerFile.file_unique_id + '.' + stickerFileType,
   );
 
@@ -80,7 +92,7 @@ async function downloadSticker(
 }
 
 async function downloadStickerPack(telegram: Telegram, stickerSet: StickerSet) {
-  const stickerSetDir = path.join(DATA_DIR, stickerSet.name);
+  const stickerSetDir = generateStickerPackDirPath(stickerSet.name);
   await fsp.mkdir(stickerSetDir);
   const queue = stickerSet.stickers.slice();
 
@@ -90,10 +102,7 @@ async function downloadStickerPack(telegram: Telegram, stickerSet: StickerSet) {
   await Promise.all(downloadPromises);
 
   const mcStickerPack = await toMcStickerPack(telegram, stickerSet);
-  const mcStickerPackPath = path.join(
-    DATA_DIR,
-    stickerSet.name + '.telegram.stickerpack',
-  );
+  const mcStickerPackPath = generateStickerPackFilePath(stickerSet.name);
   await fsp.writeFile(mcStickerPackPath, JSON.stringify(mcStickerPack));
 }
 

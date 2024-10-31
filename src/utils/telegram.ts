@@ -4,6 +4,8 @@ import {
   DATA_DIR,
   downloadStickerPack,
   isStickerPackDownloaded,
+  generateStickerPackDirPath,
+  generateStickerPackFilePath
 } from './telegramStickers.js';
 import path from 'path';
 import fsp from 'fs/promises';
@@ -20,10 +22,7 @@ bot.on(message('sticker'), async ctx => {
 
   // Download the whole sticker pack
   const stickerSet = await ctx.telegram.getStickerSet(stickerPackName);
-  const mcStickerPackPath = path.join(
-    DATA_DIR,
-    stickerSet.name + '.telegram.stickerpack',
-  );
+  const mcStickerPackPath = generateStickerPackFilePath(stickerSet.name);
   if (await isStickerPackDownloaded(stickerPackName)) {
     try {
       await fsp.access(mcStickerPackPath);
@@ -36,7 +35,18 @@ bot.on(message('sticker'), async ctx => {
   }
 
   await ctx.reply('Downloading the sticker pack...');
-  await downloadStickerPack(ctx.telegram, stickerSet);
+  try {
+    await downloadStickerPack(ctx.telegram, stickerSet);
+  } catch (e) {
+    try {
+      await fsp.rm(generateStickerPackDirPath(stickerSet.name), { recursive: true, force: true });
+    } catch (e) {}
+    try {
+      await fsp.rm(mcStickerPackPath, { force: true });
+    } catch (e) {}
+    await ctx.reply('StickerPack download error.');
+  }
+  
   try {
     await fsp.access(mcStickerPackPath);
   } catch {
