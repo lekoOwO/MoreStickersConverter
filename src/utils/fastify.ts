@@ -27,7 +27,7 @@ app.get(
       return;
     }
 
-    if (!/^(?:webp|tgs)$/i.test(fileExtension)) {
+    if (!/^(?:web[pm]|tgs)$/i.test(fileExtension)) {
       await reply.code(400).send('Invalid file extension');
       return;
     }
