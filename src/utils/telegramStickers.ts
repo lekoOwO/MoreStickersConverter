@@ -93,7 +93,7 @@ async function downloadSticker(
 
 async function downloadStickerPack(telegram: Telegram, stickerSet: StickerSet) {
   const stickerSetDir = generateStickerPackDirPath(stickerSet.name);
-  await fsp.mkdir(stickerSetDir);
+   await fsp.mkdir(stickerSetDir, { recursive: true });
   const queue = stickerSet.stickers.slice();
 
   const downloadPromises = Array.from({length: CONCURRENCY}, () =>
