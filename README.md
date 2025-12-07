@@ -38,6 +38,8 @@ A `Dockerfile` is included, and **Docker Compose is recommended** because:
 * You can bundle your reverse proxy (Nginx/Caddy/etc.)
 * It makes HTTPS setup easier for clients like Discord
 
+You can build the image locally or use the prebuilt image from `ghcr.io/lekoowo/morestickersconverter:develop`
+
 ---
 
 ## ▶️ How to Use
