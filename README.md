@@ -1,26 +1,55 @@
 # MoreStickersConverter
 
-This project provides a way to transform Telegram stickers into compatible MoreSticker sticker packs.
+MoreStickersConverter is a tool that converts **Telegram stickers** into **MoreSticker-compatible `.stickerpack` files**.
+Simply send a sticker to the bot, and it will download the asset, generate a stickerpack, and return it to you.
 
-## Setup
+This project includes both the Telegram bot logic and the HTTP server used to host sticker images.
 
-Setup the following environment variables.
+---
 
-| Variable     | Description                                                                                                                                                                                                                                  |
-|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| BOT_TOKEN    | The telegram bot token                                                                                                                                                                                                                       |
-| PORT         | Port of your HTTP Server listens to                                                                                                                                                                                                          |
-| DATA_DIR     | Where your data stores in                                                                                                                                                                                                                    |
-| EXTERNAL_URL | The external URL of your HTTP Server. Useful when you are reverse-proxing your HTTP Server. In most cases you should reverse proxy the HTTP Server since Discord client requires HTTPS connection or a Mixed-Content error may be triggered. |
+## ✨ Features
 
-We recommmand starting this app using Docker (Compose). The dockerfile is included.
+* Receive Telegram stickers from users
+* Automatically download sticker assets
+* Convert stickers into `.stickerpack` format
+* Host sticker images through the built-in HTTP server
+* Stickerpacks reference external URLs instead of embedding images
 
-Docker Compose is recommanded since you can pack your reverse proxy server in.
+---
 
-## Usage
+## ⚙️ Environment Variables
 
-Send a sticker to the telegram bot.
+Before running the service, configure the following environment variables:
 
-The bot should start download the sticker, and send you the .stickerpack file.
+| Variable         | Description                                                                                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **BOT_TOKEN**    | Telegram bot token                                                                                                                                                      |
+| **PORT**         | Port on which the built-in HTTP server will listen                                                                                                                      |
+| **DATA_DIR**     | Directory where all sticker data is stored                                                                                                                              |
+| **EXTERNAL_URL** | Public URL of this HTTP server. Required when running behind a reverse proxy. <br>Discord clients typically require HTTPS, otherwise a Mixed-Content warning may occur. |
 
-The image is hosted with the HTTP Server in this project instead of embedding inside the stickerpack file.
+---
+
+## 🐳 Recommended: Run with Docker
+
+A `Dockerfile` is included, and **Docker Compose is recommended** because:
+
+* It simplifies environment variable configuration
+* You can bundle your reverse proxy (Nginx/Caddy/etc.)
+* It makes HTTPS setup easier for clients like Discord
+
+---
+
+## ▶️ How to Use
+
+1. Send a sticker to your Telegram bot
+2. The bot downloads the sticker file
+3. The bot generates and sends back a `.stickerpack` file
+4. Sticker images are served by this project's HTTP server (they are **not embedded** inside the `.stickerpack` file)
+
+---
+
+## Notes
+
+* Since stickerpacks rely on externally hosted images, make sure your server's external URL is reachable.
+* If using a reverse proxy, ensure that HTTPS is properly configured to avoid client-side loading errors.
